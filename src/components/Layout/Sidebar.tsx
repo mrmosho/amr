@@ -4,7 +4,17 @@ import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
-import { ChevronLeft, ChevronRight, Settings, Lock, Bell, BarChart, CreditCard } from "lucide-react";
+import { 
+  ChevronLeft, 
+  ChevronRight, 
+  Settings, 
+  Lock, 
+  Bell, 
+  BarChart, 
+  CreditCard, 
+  TestTube, 
+  Users 
+} from "lucide-react";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -27,14 +37,24 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => {
       icon: <Lock className="w-5 h-5" />,
     },
     {
-      name: "Settings",
-      path: "/settings",
-      icon: <Settings className="w-5 h-5" />,
+      name: "Try Us",
+      path: "/try-us",
+      icon: <TestTube className="w-5 h-5" />,
+    },
+    {
+      name: "About Us",
+      path: "/about",
+      icon: <Users className="w-5 h-5" />,
     },
     {
       name: "Notifications",
       path: "/notifications",
       icon: <Bell className="w-5 h-5" />,
+    },
+    {
+      name: "Settings",
+      path: "/settings",
+      icon: <Settings className="w-5 h-5" />,
     },
     {
       name: "Pricing",

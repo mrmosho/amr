@@ -16,6 +16,8 @@ import MonitoringPanel from "./pages/MonitoringPanel";
 import Settings from "./pages/Settings";
 import Notifications from "./pages/Notifications";
 import Pricing from "./pages/Pricing";
+import TryUs from "./pages/TryUs";
+import AboutUs from "./pages/AboutUs";
 import NotFound from "./pages/NotFound";
 
 // Protected route component that redirects to login if not authenticated
@@ -55,6 +57,8 @@ const App = () => (
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/about" element={<AboutUs />} />
+            <Route path="/try-us" element={<TryUs />} />
             
             {/* Protected Routes with MainLayout */}
             <Route 
