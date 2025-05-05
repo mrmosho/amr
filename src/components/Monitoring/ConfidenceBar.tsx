@@ -1,34 +1,39 @@
 
 import React from "react";
-import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
-import { DetectionType } from "./DetectionItem";
+import { cn } from "@/lib/utils";
 
 interface ConfidenceBarProps {
-  confidence: number;
-  type: DetectionType;
+  value: number;
+  className?: string;
 }
 
-const ConfidenceBar: React.FC<ConfidenceBarProps> = ({ confidence, type }) => {
-  const percentage = Math.round(confidence * 100);
-  
-  const getColor = () => {
-    if (type === 'financial') {
-      return percentage > 85 ? "bg-ts-pink-500" : 
-             percentage > 50 ? "bg-ts-pink-400" : "bg-ts-pink-300";
+const ConfidenceBar: React.FC<ConfidenceBarProps> = ({ value, className }) => {
+  // Determine the color based on the confidence level
+  const getColorClass = () => {
+    if (value >= 80) {
+      return "bg-red-500";
+    } else if (value >= 60) {
+      return "bg-orange-500";
+    } else if (value >= 40) {
+      return "bg-yellow-500";
+    } else if (value >= 20) {
+      return "bg-green-500";
+    } else {
+      return "bg-blue-500";
     }
-    
-    return percentage > 85 ? "bg-ts-purple-500" : 
-           percentage > 50 ? "bg-ts-purple-400" : "bg-ts-purple-300";
   };
-  
+
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-xs whitespace-nowrap">{percentage}% confidence</span>
+    <div className={cn("space-y-1.5", className)}>
+      <div className="flex items-center justify-between text-xs">
+        <span>Confidence</span>
+        <span className="font-medium">{value}%</span>
+      </div>
       <Progress 
-        value={percentage} 
-        className="h-2 w-24"
-        indicatorClassName={cn(getColor())}
+        value={value} 
+        className={cn("h-2 w-full bg-muted")}
+        // Fixed: Removed indicatorClassName prop which was causing the build error
       />
     </div>
   );

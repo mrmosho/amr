@@ -1,14 +1,35 @@
 
 import React from "react";
-import { Bell, Search, User } from "lucide-react";
+import { Bell, Search, User, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/context/AuthContext";
+import { Badge } from "@/components/ui/badge";
 
-const TopBar: React.FC = () => {
+interface TopBarProps {
+  theme: "light" | "dark";
+  toggleTheme: () => void;
+}
+
+const TopBar: React.FC<TopBarProps> = ({ theme, toggleTheme }) => {
   const { user, logout } = useAuth();
+  
+  const securityStatus = "Protected"; // Could be "Protected", "Warning", or "At Risk"
+  
+  const getStatusColor = () => {
+    switch (securityStatus) {
+      case "Protected":
+        return "bg-green-500";
+      case "Warning":
+        return "bg-yellow-500";
+      case "At Risk":
+        return "bg-red-500";
+      default:
+        return "bg-green-500";
+    }
+  };
   
   return (
     <div className="h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center justify-between px-4">
@@ -24,6 +45,23 @@ const TopBar: React.FC = () => {
       </div>
       
       <div className="flex items-center gap-4">
+        <Badge className={`${getStatusColor()} hover:${getStatusColor()}`}>
+          {securityStatus}
+        </Badge>
+        
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          onClick={toggleTheme}
+          title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
+        >
+          {theme === "light" ? (
+            <Moon className="h-5 w-5" />
+          ) : (
+            <Sun className="h-5 w-5" />
+          )}
+        </Button>
+        
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />
           <span className="absolute top-1 right-1 flex h-2 w-2 rounded-full bg-ts-pink-500"></span>

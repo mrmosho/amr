@@ -44,6 +44,45 @@
     --sidebar-border: 250 30% 30%;
     --sidebar-ring: 260 84% 63%;
   }
+
+  .dark {
+    --background: 250 20% 6%;
+    --foreground: 250 10% 90%;
+
+    --card: 250 20% 8%;
+    --card-foreground: 250 10% 90%;
+
+    --popover: 250 20% 6%;
+    --popover-foreground: 250 10% 90%;
+
+    --primary: 260 70% 65%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 330 70% 60%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 250 20% 15%;
+    --muted-foreground: 250 10% 70%;
+
+    --accent: 330 70% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 250 20% 18%;
+    --input: 250 20% 18%;
+    --ring: 260 70% 65%;
+
+    --sidebar-background: 250 30% 10%;
+    --sidebar-foreground: 250 10% 90%;
+    --sidebar-primary: 260 70% 65%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 250 20% 15%;
+    --sidebar-accent-foreground: 250 10% 90%;
+    --sidebar-border: 250 30% 20%;
+    --sidebar-ring: 260 70% 65%;
+  }
 }
 
 @layer base {
@@ -93,3 +132,61 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+.animate-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dark .ts-gradient-primary {
+  @apply bg-gradient-to-r from-ts-purple-500 via-ts-purple-400 to-ts-pink-400;
+}
+
+/* Add Badge component */
+<lov-write file_path="src/components/ui/badge.tsx">
+import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
+
+import { cn } from "@/lib/utils"
+
+const badgeVariants = cva(
+  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  {
+    variants: {
+      variant: {
+        default:
+          "border-transparent bg-primary text-primary-foreground hover:bg-primary/80",
+        secondary:
+          "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        destructive:
+          "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
+        outline: "text-foreground",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
+
+export interface BadgeProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof badgeVariants> {}
+
+function Badge({ className, variant, ...props }: BadgeProps) {
+  return (
+    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+  )
+}
+
+export { Badge, badgeVariants }
