@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 
 interface ConfidenceBarProps {
   value: number;
+  type?: string;
   className?: string;
 }
 

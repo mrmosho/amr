@@ -1,105 +1,112 @@
-import React from "react";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import ConfidenceBar from "./ConfidenceBar";
 
-export type DetectionType = 'personal' | 'financial';
+import React from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Eye, FileText, Shield, ShieldAlert } from 'lucide-react';
+import ConfidenceBar from './ConfidenceBar';
+
+export type DetectionType = 'financial' | 'personal' | 'health' | 'password';
 
 export interface Detection {
   id: string;
-  timestamp: Date;
-  value: string;
+  timestamp: string;
+  path: string;
   type: DetectionType;
-  source: string;
+  content: string;
   confidence: number;
+  encrypted: boolean;
 }
 
 interface DetectionItemProps {
   detection: Detection;
   onEncrypt?: (id: string) => void;
-  onIgnore?: (id: string) => void;
+  onView?: (detection: Detection) => void;
 }
 
 const DetectionItem: React.FC<DetectionItemProps> = ({
   detection,
   onEncrypt,
-  onIgnore,
+  onView,
 }) => {
-  const { id, timestamp, value, type, source, confidence } = detection;
-
-  const typeColors: Record<DetectionType, string> = {
-    personal: 'bg-ts-purple-100 text-ts-purple-800 border-ts-purple-200',
-    financial: 'bg-ts-pink-100 text-ts-pink-800 border-ts-pink-200'
+  const { id, timestamp, path, type, confidence, encrypted } = detection;
+  
+  const getTypeColor = () => {
+    switch (type) {
+      case 'financial':
+        return 'bg-yellow-500 hover:bg-yellow-600';
+      case 'personal':
+        return 'bg-blue-500 hover:bg-blue-600';
+      case 'health':
+        return 'bg-green-500 hover:bg-green-600';
+      case 'password':
+        return 'bg-red-500 hover:bg-red-600';
+      default:
+        return 'bg-slate-500 hover:bg-slate-600';
+    }
   };
-
-  const formattedDate = new Intl.DateTimeFormat('en-US', {
-    dateStyle: 'medium',
-    timeStyle: 'short'
-  }).format(timestamp);
-
-  // Mask the value based on its type
-  const maskValue = (val: string, type: DetectionType): string => {
-    if (type === 'personal') {
-      return val.replace(/\w/g, '*');
+  
+  const formatTimestamp = (timestamp: string) => {
+    const date = new Date(timestamp);
+    return date.toLocaleString();
+  };
+  
+  const handleEncrypt = () => {
+    if (onEncrypt) {
+      onEncrypt(id);
     }
-    // For financial data, keep first and last characters
-    if (type === 'financial' && val.length > 4) {
-      return val.slice(0, 2) + '*'.repeat(val.length - 4) + val.slice(-2);
+  };
+  
+  const handleView = () => {
+    if (onView) {
+      onView(detection);
     }
-    return '*'.repeat(val.length);
   };
 
   return (
-    <Card className={cn(
-      "relative overflow-hidden transition-all duration-300 hover:shadow-md",
-      confidence > 0.85 ? "border-l-4 pulse-border" : "",
-      confidence > 0.85 && type === 'financial' ? "border-l-ts-pink-500" : "",
-      confidence > 0.85 && type === 'personal' ? "border-l-ts-purple-500" : ""
-    )}>
-      <CardContent className="p-4">
-        <div className="flex justify-between items-start mb-2">
-          <Badge variant="outline" className={cn("font-medium", typeColors[type])}>
-            {type.charAt(0).toUpperCase() + type.slice(1)}
-          </Badge>
-          <span className="text-xs text-muted-foreground">{formattedDate}</span>
-        </div>
-        
-        <div className="space-y-2 mt-3">
-          <div className="flex items-start">
-            <div className="text-lg font-mono bg-muted p-1 px-2 rounded w-full">
-              {maskValue(value, type)}
-            </div>
+    <div className="border rounded-lg p-4 mb-4 bg-card hover:shadow-md transition-shadow">
+      <div className="flex justify-between items-start mb-3">
+        <div>
+          <div className="flex items-center space-x-2 mb-1">
+            <FileText className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm font-medium truncate max-w-[200px]">{path}</span>
           </div>
-          
-          <div className="flex justify-between items-center">
-            <span className="text-xs text-muted-foreground">Source: {source}</span>
-            <ConfidenceBar confidence={confidence} type={type} />
+          <div className="text-xs text-muted-foreground">
+            {formatTimestamp(timestamp)}
           </div>
         </div>
-      </CardContent>
+        <Badge className={`${getTypeColor()} text-white`}>
+          {type.charAt(0).toUpperCase() + type.slice(1)}
+        </Badge>
+      </div>
       
-      <CardFooter className="px-4 py-3 border-t bg-muted/50 flex justify-end gap-2">
-        <Button
-          variant="ghost" 
-          size="sm"
-          onClick={() => onIgnore?.(id)}
+      <div className="mb-3">
+        <ConfidenceBar value={confidence} />
+      </div>
+      
+      <div className="flex justify-between mt-4">
+        <button 
+          className="text-xs flex items-center space-x-1 text-muted-foreground hover:text-foreground"
+          onClick={handleView}
         >
-          Ignore
-        </Button>
-        <Button 
-          size="sm"
-          className={cn(
-            type === 'financial' ? "bg-ts-pink-500 hover:bg-ts-pink-600" : 
-            "bg-ts-purple-500 hover:bg-ts-purple-600"
-          )}
-          onClick={() => onEncrypt?.(id)}
-        >
-          Encrypt
-        </Button>
-      </CardFooter>
-    </Card>
+          <Eye className="h-3 w-3" />
+          <span>View</span>
+        </button>
+        
+        {!encrypted ? (
+          <button 
+            className="text-xs flex items-center space-x-1 text-muted-foreground hover:text-foreground"
+            onClick={handleEncrypt}
+          >
+            <ShieldAlert className="h-3 w-3" />
+            <span>Encrypt</span>
+          </button>
+        ) : (
+          <div className="text-xs flex items-center space-x-1 text-green-500">
+            <Shield className="h-3 w-3" />
+            <span>Encrypted</span>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

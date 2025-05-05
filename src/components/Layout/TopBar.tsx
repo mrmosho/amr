@@ -1,101 +1,60 @@
 
-import React from "react";
-import { Bell, Search, User, Sun, Moon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useAuth } from "@/context/AuthContext";
-import { Badge } from "@/components/ui/badge";
+import React from 'react';
+import { useTheme } from 'next-themes';
+import { Sun, Moon, Bell } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
-interface TopBarProps {
-  theme: "light" | "dark";
-  toggleTheme: () => void;
-}
+type SecurityStatus = 'Protected' | 'Warning' | 'At Risk';
 
-const TopBar: React.FC<TopBarProps> = ({ theme, toggleTheme }) => {
-  const { user, logout } = useAuth();
-  
-  const securityStatus = "Protected"; // Could be "Protected", "Warning", or "At Risk"
+const TopBar = () => {
+  const { theme, setTheme } = useTheme();
+  const [securityStatus, setSecurityStatus] = React.useState<SecurityStatus>('Protected');
   
   const getStatusColor = () => {
     switch (securityStatus) {
-      case "Protected":
-        return "bg-green-500";
-      case "Warning":
-        return "bg-yellow-500";
-      case "At Risk":
-        return "bg-red-500";
+      case 'Protected':
+        return 'bg-green-500';
+      case 'Warning':
+        return 'bg-yellow-500';
+      case 'At Risk':
+        return 'bg-red-500';
       default:
-        return "bg-green-500";
+        return 'bg-green-500';
     }
   };
-  
+
+  const toggleTheme = () => {
+    setTheme(theme === 'dark' ? 'light' : 'dark');
+  };
+
   return (
-    <div className="h-16 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 flex items-center justify-between px-4">
-      <div className="flex items-center">
-        <div className="relative w-80">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search..."
-            className="w-full bg-background pl-8 focus-visible:ring-ts-purple-500"
-          />
+    <div className="h-16 border-b flex items-center justify-between px-4 bg-background">
+      <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-2">
+          <div className={`w-2 h-2 rounded-full ${getStatusColor()}`}></div>
+          <Badge variant="outline" className="text-xs font-medium">
+            {securityStatus}
+          </Badge>
         </div>
       </div>
       
-      <div className="flex items-center gap-4">
-        <Badge className={`${getStatusColor()} hover:${getStatusColor()}`}>
-          {securityStatus}
-        </Badge>
-        
-        <Button 
-          variant="ghost" 
-          size="icon" 
+      <div className="flex items-center space-x-2">
+        <button 
           onClick={toggleTheme}
-          title={theme === "light" ? "Switch to Dark Mode" : "Switch to Light Mode"}
+          className="p-2 rounded-full hover:bg-muted"
+          aria-label="Toggle theme"
         >
-          {theme === "light" ? (
-            <Moon className="h-5 w-5" />
-          ) : (
-            <Sun className="h-5 w-5" />
-          )}
-        </Button>
+          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+        </button>
         
-        <Button variant="ghost" size="icon" className="relative">
-          <Bell className="h-5 w-5" />
-          <span className="absolute top-1 right-1 flex h-2 w-2 rounded-full bg-ts-pink-500"></span>
-        </Button>
+        <button className="p-2 rounded-full hover:bg-muted relative" aria-label="Notifications">
+          <Bell size={18} />
+          <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+        </button>
         
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-              <Avatar className="h-9 w-9">
-                <AvatarImage src="" alt={user?.name || "User"} />
-                <AvatarFallback className="bg-ts-purple-100 text-ts-purple-700">
-                  {user?.name?.charAt(0) || "U"}
-                </AvatarFallback>
-              </Avatar>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56" align="end" forceMount>
-            <DropdownMenuLabel>
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{user?.name}</p>
-                <p className="text-xs leading-none text-muted-foreground">
-                  {user?.email}
-                </p>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={logout}>
-              Log out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-sm">
+          TS
+        </div>
       </div>
     </div>
   );
