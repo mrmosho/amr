@@ -25,11 +25,11 @@ const AboutUs: React.FC = () => {
       id: 1,
       name: 'Prof. Hany Ammar',
       role: 'Project Supervisor',
-      image: 'https://via.placeholder.com/150',
+      image: '/images/dr-hany.jpg', // ✅ Corrected
       bio: 'Leading the team with expertise in security and software engineering. Prof. Ammar brings years of academic and industry experience to guide the project vision.',
       isSupervisor: true,
       links: {
-        email: 'hammar@example.com',
+        email: 'ammar@example.com',
         linkedin: '#'
       }
     },
@@ -37,7 +37,7 @@ const AboutUs: React.FC = () => {
       id: 2,
       name: 'Omar Husam',
       role: 'Project Lead',
-      image: 'https://via.placeholder.com/150',
+      image: '/images/omar.jpg', // ✅ Corrected
       bio: 'Responsible for overall project coordination and technical architecture. Omar specializes in secure system design and cryptography implementation.',
       links: {
         github: '#',
@@ -49,7 +49,7 @@ const AboutUs: React.FC = () => {
       id: 3,
       name: 'Amr Mohamed',
       role: 'Frontend Developer',
-      image: 'https://via.placeholder.com/150',
+      image: '/images/amr.jpg', // ✅ Corrected
       bio: 'Crafting the user interface with a focus on usability and accessibility. Amr is passionate about creating intuitive security tools for non-technical users.',
       links: {
         github: '#',
@@ -61,7 +61,7 @@ const AboutUs: React.FC = () => {
       id: 4,
       name: 'Marwan Mohamed',
       role: 'Security Specialist',
-      image: 'https://via.placeholder.com/150',
+      image: '/images/marwan.jpg', // ✅ Corrected
       bio: 'Focused on encryption algorithms and detection patterns. Marwan ensures that the system provides reliable protection against evolving security threats.',
       links: {
         github: '#',
@@ -73,7 +73,7 @@ const AboutUs: React.FC = () => {
       id: 5,
       name: 'Ahmed Ali',
       role: 'Backend Developer',
-      image: 'https://via.placeholder.com/150',
+      image: '/images/ahmed.jpg', // ✅ Corrected
       bio: 'Building the robust backend infrastructure that powers our sensitive data detection engine. Ahmed specializes in scalable and secure API development.',
       links: {
         github: '#',
@@ -110,24 +110,21 @@ const AboutUs: React.FC = () => {
               key={member.id} 
               className="col-span-full mx-auto max-w-md group hover:shadow-lg transition-all duration-300 border-primary/20"
             >
-              <CardHeader className="text-center relative overflow-hidden pb-0">
-                <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent z-0"></div>
-                <div className="relative z-10">
-                  <div className="w-32 h-32 mx-auto rounded-full overflow-hidden mb-4 border-4 border-primary/20 grayscale group-hover:grayscale-0 transition-all duration-500">
-                    <img 
-                      src={member.image} 
-                      alt={member.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <Badge variant="outline" className="bg-primary/10 mb-2">
-                    {member.isSupervisor ? 'Supervisor' : ''}
-                  </Badge>
-                  <CardTitle className="text-xl">{member.name}</CardTitle>
-                  <CardDescription>{member.role}</CardDescription>
+              <CardHeader className="text-center">
+                <div className="w-32 h-32 mx-auto rounded-full overflow-hidden mb-4 border-4 border-primary/20 grayscale group-hover:grayscale-0 transition-all duration-500">
+                  <img 
+                    src={member.image} 
+                    alt={member.name}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
+                <Badge variant="outline" className="bg-primary/10 mb-2">
+                  {member.isSupervisor ? 'Supervisor' : ''}
+                </Badge>
+                <CardTitle className="text-xl">{member.name}</CardTitle>
+                <CardDescription>{member.role}</CardDescription>
               </CardHeader>
-              <CardContent className="text-center mt-4 group-hover:transform group-hover:translate-y-0 transform translate-y-4 opacity-0 group-hover:opacity-100 transition-all duration-300">
+              <CardContent className="text-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <p className="text-sm text-muted-foreground">{member.bio}</p>
               </CardContent>
               <CardFooter className="flex justify-center space-x-4">
@@ -150,10 +147,7 @@ const AboutUs: React.FC = () => {
         {teamMembers
           .filter(member => !member.isSupervisor)
           .map(member => (
-            <Card 
-              key={member.id} 
-              className="group hover:scale-105 hover:shadow-lg transition-all duration-300"
-            >
+            <Card key={member.id} className="group hover:scale-105 hover:shadow-lg transition-all duration-300">
               <CardHeader className="text-center">
                 <div className="w-24 h-24 mx-auto rounded-full overflow-hidden mb-4 border-2 border-muted grayscale group-hover:grayscale-0 transition-all duration-500">
                   <img 
