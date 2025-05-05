@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Toggle } from "@/components/ui/toggle";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Check, Shield, Gift, Star, Clock } from "lucide-react";
+import { Check, Shield, Gift, Star, Clock, ArrowLeft } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Pricing: React.FC = () => {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
@@ -64,6 +65,15 @@ const Pricing: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-12">
+      <div className="flex items-center justify-between mb-8">
+        <Link to="/dashboard">
+          <Button variant="ghost" className="flex items-center gap-2">
+            <ArrowLeft size={16} />
+            Back to Dashboard
+          </Button>
+        </Link>
+      </div>
+      
       <div className="text-center mb-12">
         <h1 className="text-3xl font-bold mb-4">Choose Your Security Plan</h1>
         <p className="text-muted-foreground max-w-2xl mx-auto">
