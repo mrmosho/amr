@@ -14,18 +14,22 @@ export interface Detection {
   content: string;
   confidence: number;
   encrypted: boolean;
+  source?: string; // Added to match usage in MonitoringPanel
+  value?: string; // Added to match usage in MonitoringPanel
 }
 
 interface DetectionItemProps {
   detection: Detection;
   onEncrypt?: (id: string) => void;
   onView?: (detection: Detection) => void;
+  onIgnore?: (id: string) => void; // Added this prop
 }
 
 const DetectionItem: React.FC<DetectionItemProps> = ({
   detection,
   onEncrypt,
   onView,
+  onIgnore,
 }) => {
   const { id, timestamp, path, type, confidence, encrypted } = detection;
   
@@ -60,6 +64,12 @@ const DetectionItem: React.FC<DetectionItemProps> = ({
       onView(detection);
     }
   };
+  
+  const handleIgnore = () => {
+    if (onIgnore) {
+      onIgnore(id);
+    }
+  };
 
   return (
     <div className="border rounded-lg p-4 mb-4 bg-card hover:shadow-md transition-shadow">
@@ -92,13 +102,24 @@ const DetectionItem: React.FC<DetectionItemProps> = ({
         </button>
         
         {!encrypted ? (
-          <button 
-            className="text-xs flex items-center space-x-1 text-muted-foreground hover:text-foreground"
-            onClick={handleEncrypt}
-          >
-            <ShieldAlert className="h-3 w-3" />
-            <span>Encrypt</span>
-          </button>
+          <div className="flex space-x-3">
+            <button 
+              className="text-xs flex items-center space-x-1 text-muted-foreground hover:text-foreground"
+              onClick={handleEncrypt}
+            >
+              <ShieldAlert className="h-3 w-3" />
+              <span>Encrypt</span>
+            </button>
+            
+            {onIgnore && (
+              <button 
+                className="text-xs flex items-center space-x-1 text-muted-foreground hover:text-foreground"
+                onClick={handleIgnore}
+              >
+                <span>Ignore</span>
+              </button>
+            )}
+          </div>
         ) : (
           <div className="text-xs flex items-center space-x-1 text-green-500">
             <Shield className="h-3 w-3" />

@@ -6,7 +6,12 @@ import { Badge } from '@/components/ui/badge';
 
 type SecurityStatus = 'Protected' | 'Warning' | 'At Risk';
 
-const TopBar = () => {
+interface TopBarProps {
+  theme?: 'light' | 'dark';
+  toggleTheme?: () => void;
+}
+
+const TopBar: React.FC<TopBarProps> = ({ theme: propTheme, toggleTheme: propToggleTheme }) => {
   const { theme, setTheme } = useTheme();
   const [securityStatus, setSecurityStatus] = React.useState<SecurityStatus>('Protected');
   
@@ -23,9 +28,15 @@ const TopBar = () => {
     }
   };
 
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
+  const handleToggleTheme = () => {
+    if (propToggleTheme) {
+      propToggleTheme();
+    } else {
+      setTheme(theme === 'dark' ? 'light' : 'dark');
+    }
   };
+
+  const currentTheme = propTheme || theme;
 
   return (
     <div className="h-16 border-b flex items-center justify-between px-4 bg-background">
@@ -40,11 +51,11 @@ const TopBar = () => {
       
       <div className="flex items-center space-x-2">
         <button 
-          onClick={toggleTheme}
+          onClick={handleToggleTheme}
           className="p-2 rounded-full hover:bg-muted"
           aria-label="Toggle theme"
         >
-          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          {currentTheme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
         </button>
         
         <button className="p-2 rounded-full hover:bg-muted relative" aria-label="Notifications">

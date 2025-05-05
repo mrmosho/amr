@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,51 +13,69 @@ import { useToast } from "@/hooks/use-toast";
 const mockDetections: Detection[] = [
   {
     id: "1",
-    timestamp: new Date(2025, 4, 4, 14, 32),
-    value: "4532015112830366",
+    timestamp: new Date(2025, 4, 4, 14, 32).toISOString(),
+    path: "example.docx",
     type: "financial",
+    content: "4532015112830366",
+    confidence: 92,
+    encrypted: false,
     source: "example.docx",
-    confidence: 0.92
+    value: "4532015112830366"
   },
   {
     id: "2",
-    timestamp: new Date(2025, 4, 4, 13, 15),
-    value: "johndoe@example.com",
+    timestamp: new Date(2025, 4, 4, 13, 15).toISOString(),
+    path: "contacts.xlsx",
     type: "personal",
+    content: "johndoe@example.com",
+    confidence: 86,
+    encrypted: false,
     source: "contacts.xlsx",
-    confidence: 0.86
+    value: "johndoe@example.com"
   },
   {
     id: "3",
-    timestamp: new Date(2025, 4, 4, 10, 45),
-    value: "555-123-4567",
+    timestamp: new Date(2025, 4, 4, 10, 45).toISOString(),
+    path: "customer_data.csv",
     type: "personal",
+    content: "555-123-4567",
+    confidence: 78,
+    encrypted: false,
     source: "customer_data.csv",
-    confidence: 0.78
+    value: "555-123-4567"
   },
   {
     id: "4",
-    timestamp: new Date(2025, 4, 3, 16, 20),
-    value: "475019948",
+    timestamp: new Date(2025, 4, 3, 16, 20).toISOString(),
+    path: "invoice.pdf",
     type: "financial",
+    content: "475019948",
+    confidence: 95,
+    encrypted: false,
     source: "invoice.pdf",
-    confidence: 0.95
+    value: "475019948"
   },
   {
     id: "5",
-    timestamp: new Date(2025, 4, 3, 14, 10),
-    value: "123 Main St, Anytown, USA",
+    timestamp: new Date(2025, 4, 3, 14, 10).toISOString(),
+    path: "shipping_info.doc",
     type: "personal",
+    content: "123 Main St, Anytown, USA",
+    confidence: 82,
+    encrypted: false,
     source: "shipping_info.doc",
-    confidence: 0.82
+    value: "123 Main St, Anytown, USA"
   },
   {
     id: "6",
-    timestamp: new Date(2025, 4, 2, 9, 33),
-    value: "1234-5678-9012-3456",
+    timestamp: new Date(2025, 4, 2, 9, 33).toISOString(),
+    path: "payment_details.txt",
     type: "financial",
+    content: "1234-5678-9012-3456",
+    confidence: 88,
+    encrypted: false,
     source: "payment_details.txt",
-    confidence: 0.88
+    value: "1234-5678-9012-3456"
   }
 ];
 
@@ -94,8 +111,10 @@ const MonitoringPanel: React.FC = () => {
       .filter(d => !type || d.type === type)
       .filter(d => 
         searchTerm === "" || 
-        d.source.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        d.value.toLowerCase().includes(searchTerm.toLowerCase())
+        d.source?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        d.value?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        d.path.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        d.content.toLowerCase().includes(searchTerm.toLowerCase())
       );
   };
 
