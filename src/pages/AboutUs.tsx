@@ -1,8 +1,9 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Github, Linkedin, Mail, Users } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Github, Linkedin, Mail, Users, LayoutDashboard } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface TeamMember {
   id: number;
@@ -94,6 +95,11 @@ const AboutUs: React.FC = () => {
           cybersecurity, software development, and user experience to create a comprehensive
           sensitive data protection solution.
         </p>
+        <Link to="/dashboard" className="mt-4">
+          <Button variant="outline" size="sm" className="gap-2">
+            <LayoutDashboard className="h-4 w-4" /> Back to Dashboard
+          </Button>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">

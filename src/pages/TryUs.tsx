@@ -6,8 +6,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { TestTube, Upload, Eye, FileText } from 'lucide-react';
+import { TestTube, Upload, Eye, FileText, LayoutDashboard } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Link } from 'react-router-dom';
 import DetectionItem, { Detection, DetectionType } from '@/components/Monitoring/DetectionItem';
 
 const TryUs: React.FC = () => {
@@ -214,6 +215,11 @@ const TryUs: React.FC = () => {
           Experience how our system identifies and protects sensitive data in real-time.
           Upload a file or paste your content to see the detection in action.
         </p>
+        <Link to="/dashboard" className="mt-4">
+          <Button variant="outline" size="sm" className="gap-2">
+            <LayoutDashboard className="h-4 w-4" /> Back to Dashboard
+          </Button>
+        </Link>
       </div>
 
       <Card className="shadow-md animate-in">
