@@ -1,10 +1,9 @@
-
 import React from "react";
 import StatsCard from "@/components/Dashboard/StatsCard";
 import DetectionChart from "@/components/Dashboard/DetectionChart";
 import { Bell, Lock, Settings, ShieldCheck } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/UI/card";
+import { Button } from "@/components/UI/button";
 import SystemTray from "@/components/UI/SystemTray";
 
 // Mock data for demonstration

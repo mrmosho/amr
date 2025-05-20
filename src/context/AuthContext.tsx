@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 interface User {
@@ -77,25 +76,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const register = async (name: string, email: string, password: string) => {
     setIsLoading(true);
-    
+
     try {
-      // Mock API call - would be replaced with actual registration API
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      
-      // Simulate successful registration and auto-login
-      const mockUser = {
-        id: "1",
-        name: name,
-        email: email,
-      };
-      
-      // Store token in local storage
-      localStorage.setItem("ts-auth-token", "mock-jwt-token");
-      
-      setUser(mockUser);
-    } catch (error) {
+      const response = await fetch("http://localhost:3001/api/users/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, password }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Registration failed. Please try again.");
+      }
+
+      const userData = await response.json();
+      setUser(userData);
+    } catch (error: any) {
       console.error("Registration failed:", error);
-      throw new Error("Registration failed. Please try again.");
+      throw new Error(error.message || "Registration failed. Please try again.");
     } finally {
       setIsLoading(false);
     }

@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Progress } from "@/components/ui/progress";
+import { Progress } from "@/components/UI/progress";
 import { cn } from "@/lib/utils";
 
 interface ConfidenceBarProps {

@@ -1,9 +1,8 @@
-
 import React, { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/UI/card";
+import { Button } from "@/components/UI/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/UI/tabs";
+import { Badge } from "@/components/UI/badge";
 import { cn } from "@/lib/utils";
 import { Bell, Check, ShieldAlert, Settings, Info } from "lucide-react";
 

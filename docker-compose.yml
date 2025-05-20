@@ -1,0 +1,132 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:15
+    container_name: secure-vision-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: secure_vision_shield
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - '5432:5432'
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - secure-vision-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  db-backup:
+    image: postgres:15
+    container_name: secure-vision-db-backup
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: secure_vision_shield
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - '5433:5432'
+    volumes:
+      - db_backup_data:/var/lib/postgresql/data
+    networks:
+      - secure-vision-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      db:
+        condition: service_started
+
+  backend:
+    build:
+      context: ./backend
+    container_name: secure-vision-backend
+    restart: unless-stopped
+    environment:
+      PORT: 3001
+      NODE_ENV: production
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: secure_vision_shield
+      DB_USER: postgres
+      DB_PASSWORD: 123456
+      JWT_SECRET: your_jwt_secret_here
+      JWT_EXPIRES_IN: 24h
+      CORS_ORIGIN: https://type-secure.online
+    expose:
+      - '3001'
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - secure-vision-net
+    volumes:
+      - ./backend:/usr/src/app
+    command: sh -c "npm install && npm run build && npm start"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  backend-backup:
+    build:
+      context: ./backend
+    container_name: secure-vision-backend-backup
+    restart: unless-stopped
+    environment:
+      PORT: 3002
+      NODE_ENV: production
+      DB_HOST: db-backup
+      DB_PORT: 5432
+      DB_NAME: secure_vision_shield
+      DB_USER: postgres
+      DB_PASSWORD: 123456
+      JWT_SECRET: your_jwt_secret_here
+      JWT_EXPIRES_IN: 24h
+      CORS_ORIGIN: https://type-secure.online
+    expose:
+      - '3002'
+    depends_on:
+      db-backup:
+        condition: service_healthy
+      backend:
+        condition: service_started
+    networks:
+      - secure-vision-net
+    volumes:
+      - ./backend:/usr/src/app
+    command: sh -c "npm install && npm run build && npm start"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: secure-vision-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    networks:
+      - secure-vision-net
+    depends_on:
+      - backend
+      - backend-backup
+
+volumes:
+  db_data:
+  db_backup_data:
+
+networks:
+  secure-vision-net:
+    driver: bridge 

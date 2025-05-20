@@ -1,9 +1,8 @@
-
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Toggle } from "@/components/ui/toggle";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Button } from "@/components/UI/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/UI/card";
+import { Toggle } from "@/components/UI/toggle";
+import { ToggleGroup, ToggleGroupItem } from "@/components/UI/toggle-group";
 import { Check, Shield, Gift, Star, Clock, ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
 
