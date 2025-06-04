@@ -5,6 +5,8 @@ import { Bell, Lock, Settings, ShieldCheck } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/UI/card";
 import { Button } from "@/components/UI/button";
 import SystemTray from "@/components/UI/SystemTray";
+import { useQuery } from '@tanstack/react-query';
+import { apiService } from '@/services/api.service';
 
 // Mock data for demonstration
 const chartData = [
@@ -18,6 +20,14 @@ const chartData = [
 ];
 
 const Dashboard: React.FC = () => {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['monitoring-data'],
+    queryFn: apiService.getMonitoringData
+  });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading data</div>;
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
