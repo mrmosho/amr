@@ -28,6 +28,17 @@ const Login: React.FC = () => {
       if (error) throw error;
 
       if (data.user) {
+        // Create or update user profile in profiles table
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: data.user.id,
+            email: data.user.email,
+            updated_at: new Date().toISOString(),
+          });
+
+        if (profileError) throw profileError;
+
         toast({
           title: "Welcome back!",
           description: "Successfully logged in",
@@ -49,8 +60,12 @@ const Login: React.FC = () => {
   const handleGithubLogin = async () => {
     try {
       const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'github'
+        provider: 'github',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`
+        }
       });
+
       if (error) throw error;
     } catch (error: any) {
       toast({
