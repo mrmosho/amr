@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import StatsCard from "@/components/Dashboard/StatsCard";
 import DetectionChart from "@/components/Dashboard/DetectionChart";
 import { Bell, Lock, Settings, ShieldCheck } from "lucide-react";
@@ -6,27 +6,45 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/UI/button";
 import SystemTray from "@/components/UI/SystemTray";
 import { useQuery } from '@tanstack/react-query';
-import { apiService } from '@/services/api.service';
+import { databaseService } from '@/services/database.service';
+import { useAuth } from '@/hooks/useAuth';
 
 // Mock data for demonstration
-const chartData = [
-  { name: "Jan", personal: 12, financial: 8 },
-  { name: "Feb", personal: 19, financial: 14 },
-  { name: "Mar", personal: 15, financial: 11 },
-  { name: "Apr", personal: 27, financial: 19 },
-  { name: "May", personal: 32, financial: 25 },
-  { name: "Jun", personal: 20, financial: 18 },
-  { name: "Jul", personal: 29, financial: 21 },
+const initialChartData = [
+  
 ];
 
 const Dashboard: React.FC = () => {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['monitoring-data'],
-    queryFn: apiService.getMonitoringData
+  const { user } = useAuth();
+
+  const { data: stats, isLoading } = useQuery({
+    queryKey: ['dashboard-stats', user?.id],
+    queryFn: () => databaseService.getDashboardStats(user!.id),
+    enabled: !!user
   });
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error loading data</div>;
+  const { data: recentDetections } = useQuery({
+    queryKey: ['recent-detections'],
+    queryFn: databaseService.getRecentDetections
+  });
+
+  const { data: chartData = initialChartData } = useQuery({
+    queryKey: ['detection-history'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('detections')
+        .select('threat_type, detection_date')
+        .gte('detection_date', new Date(Date.now() - 7 * 30 * 24 * 60 * 60 * 1000).toISOString());
+
+      // Transform data for chart
+      // ... transform logic here
+      return data; // Assuming data is already in the desired format
+    }
+  });
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="space-y-6">
@@ -42,9 +60,8 @@ const Dashboard: React.FC = () => {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard
           title="Total Detections"
-          value="846"
+          value={stats?.totalDetections.toString() || "0"}
           icon={<ShieldCheck className="h-4 w-4" />}
-          trend={{ value: 12, isPositive: false }}
         />
         <StatsCard
           title="Protected Files"
