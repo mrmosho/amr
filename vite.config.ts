@@ -3,12 +3,14 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 
 export default defineConfig(({ mode }) => {
-  // Load env file based on `mode` in the current working directory.
   const env = loadEnv(mode, process.cwd(), "");
 
-  console.log("Loaded environment variables:", {
-    hasSupabaseUrl: !!env.VITE_SUPABASE_URL,
-    hasSupabaseKey: !!env.VITE_SUPABASE_ANON_KEY,
+  // More verbose debugging
+  console.log("Environment Variables Debug:", {
+    mode,
+    supabaseUrl: env.VITE_SUPABASE_URL,
+    hasKey: !!env.VITE_SUPABASE_ANON_KEY,
+    cwd: process.cwd(),
   });
 
   return {
@@ -19,7 +21,9 @@ export default defineConfig(({ mode }) => {
       },
     },
     define: {
-      "process.env": env,
+      // Explicitly expose env variables to client
+      'import.meta.env.VITE_SUPABASE_URL': JSON.stringify(env.VITE_SUPABASE_URL),
+      'import.meta.env.VITE_SUPABASE_ANON_KEY': JSON.stringify(env.VITE_SUPABASE_ANON_KEY),
     },
   };
 });
