@@ -5,8 +5,8 @@ import { Input } from "@/components/UI/input";
 import { Label } from "@/components/UI/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/UI/card";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/context/AuthContext";
 import { Lock } from "lucide-react";
+import { supabase } from "@/lib/supabase"; // Add this import
 
 const Register: React.FC = () => {
   const [name, setName] = useState("");
@@ -15,8 +15,9 @@ const Register: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const { register } = useAuth();
   const navigate = useNavigate();
+
+  // Remove useAuth hook since we're using Supabase directly
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,8 +45,9 @@ const Register: React.FC = () => {
     }
 
     try {
-      // First create the auth user
-      const { data: authData, error: authError } = await supabase.auth.signUp({
+      console.log('Starting registration process...');
+      
+      const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
         options: {
@@ -55,20 +57,14 @@ const Register: React.FC = () => {
         }
       });
 
-      if (authError) throw authError;
+      if (error) {
+        console.error('Supabase auth error:', error);
+        throw error;
+      }
 
-      if (authData.user) {
-        // Then create the profile
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            id: authData.user.id,
-            email: email.trim(),
-            full_name: name.trim(),
-          });
+      console.log('Registration successful:', data);
 
-        if (profileError) throw profileError;
-
+      if (data.user) {
         toast({
           title: "Account created!",
           description: "Please check your email to confirm your account.",
