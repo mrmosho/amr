@@ -20,25 +20,21 @@ const Login: React.FC = () => {
     setIsLoading(true);
     
     try {
+      // Log the attempt
+      console.log('Attempting login with:', { email, hasPassword: !!password });
+
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: email.trim(),
+        password: password
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Auth error:', error);
+        throw error;
+      }
 
       if (data.user) {
-        // Create or update user profile in profiles table
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .upsert({
-            id: data.user.id,
-            email: data.user.email,
-            updated_at: new Date().toISOString(),
-          });
-
-        if (profileError) throw profileError;
-
+        console.log('Login successful:', data.user.id);
         toast({
           title: "Welcome back!",
           description: "Successfully logged in",
@@ -46,10 +42,11 @@ const Login: React.FC = () => {
         navigate("/dashboard");
       }
     } catch (error: any) {
+      console.error('Login error:', error);
       toast({
         variant: "destructive",
         title: "Authentication failed",
-        description: error.message || "Invalid email or password",
+        description: error.message || "Invalid credentials",
       });
     } finally {
       setIsLoading(false);

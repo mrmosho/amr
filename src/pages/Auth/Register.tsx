@@ -20,26 +20,38 @@ const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (password !== confirmPassword) {
-      toast({
-        variant: "destructive",
-        title: "Passwords don't match",
-        description: "Please ensure both passwords match",
-      });
-      return;
-    }
-    
     setIsLoading(true);
-    
+
     try {
-      await register(name, email, password);
-      navigate("/dashboard");
-    } catch (error) {
+      console.log('Attempting registration:', { email, hasPassword: !!password });
+
+      const { data, error } = await supabase.auth.signUp({
+        email: email.trim(),
+        password: password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`
+        }
+      });
+
+      if (error) {
+        console.error('Registration error:', error);
+        throw error;
+      }
+
+      if (data.user) {
+        console.log('Registration successful:', data.user.id);
+        toast({
+          title: "Account created!",
+          description: "Please check your email to confirm your account.",
+        });
+        navigate("/login");
+      }
+    } catch (error: any) {
+      console.error('Registration error:', error);
       toast({
         variant: "destructive",
         title: "Registration failed",
-        description: "There was an error creating your account",
+        description: error.message || "Could not create account",
       });
     } finally {
       setIsLoading(false);

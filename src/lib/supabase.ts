@@ -1,27 +1,24 @@
 import { createClient } from '@supabase/supabase-js'
 
-// Debug environment variables
-const debugEnv = () => {
-  console.log('Supabase Configuration:', {
-    url: import.meta.env.VITE_SUPABASE_URL,
-    hasKey: !!import.meta.env.VITE_SUPABASE_ANON_KEY,
-    isDevelopment: import.meta.env.DEV,
-    mode: import.meta.env.MODE,
-  });
-};
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-debugEnv();
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Add debug logging
+console.log('Supabase Init:', {
+  hasUrl: !!supabaseUrl,
+  hasKey: !!supabaseKey,
+  urlLength: supabaseUrl?.length,
+  keyLength: supabaseKey?.length
+})
 
 if (!supabaseUrl || !supabaseKey) {
-  throw new Error(
-    `Environment Variables Missing:
-    URL: ${!!supabaseUrl}
-    Key: ${!!supabaseKey}
-    Please check your .env file and Vite configuration.`
-  );
+  throw new Error('Missing Supabase credentials')
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true
+  }
+})
