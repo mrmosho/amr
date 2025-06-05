@@ -23,30 +23,7 @@ const Register: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Validation
-    if (password !== confirmPassword) {
-      toast({
-        variant: "destructive",
-        title: "Passwords do not match",
-        description: "Please make sure your passwords match",
-      });
-      setIsLoading(false);
-      return;
-    }
-
-    if (password.length < 6) {
-      toast({
-        variant: "destructive", 
-        title: "Password too short",
-        description: "Password must be at least 6 characters long",
-      });
-      setIsLoading(false);
-      return;
-    }
-
     try {
-      console.log('Starting registration process...');
-      
       const { data, error } = await supabase.auth.signUp({
         email: email.trim(),
         password,
@@ -54,22 +31,28 @@ const Register: React.FC = () => {
           data: {
             full_name: name.trim(),
           },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         }
       });
 
-      if (error) {
-        console.error('Supabase auth error:', error);
-        throw error;
-      }
-
-      console.log('Registration successful:', data);
+      if (error) throw error;
 
       if (data.user) {
-        toast({
-          title: "Account created!",
-          description: "Please check your email to confirm your account.",
-        });
-        navigate("/login");
+        if (data.session) {
+          // User is automatically signed in - redirect to dashboard
+          toast({
+            title: "Account created!",
+            description: "Welcome to your dashboard",
+          });
+          navigate("/dashboard", { replace: true });
+        } else {
+          // Email confirmation required
+          toast({
+            title: "Account created!",
+            description: "Please check your email to confirm your account",
+          });
+          navigate("/login", { replace: true });
+        }
       }
     } catch (error: any) {
       console.error('Registration error:', error);

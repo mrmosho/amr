@@ -2,8 +2,9 @@ import { Toaster } from "@/components/UI/toaster";
 import { Toaster as Sonner } from "@/components/UI/sonner";
 import { TooltipProvider } from "@/components/UI/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { ProtectedRoute } from '@/components/Auth/ProtectedRoute';
 import MainLayout from "./components/Layout/MainLayout";
 
 import Index from "./pages/Index";
@@ -41,7 +42,14 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -51,6 +59,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
+            {/* Public Routes */}
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -58,52 +67,22 @@ const App = () => (
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/about" element={<AboutUs />} />
             <Route path="/try-us" element={<TryUs />} />
-            
-            {/* Protected Routes with MainLayout */}
-            <Route 
-              path="/dashboard" 
-              element={
-                <ProtectedRoute>
-                  <MainLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Dashboard />} />
+
+            {/* Protected Routes Group */}
+            <Route element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Outlet />
+                </MainLayout>
+              </ProtectedRoute>
+            }>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/monitoring" element={<MonitoringPanel />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/notifications" element={<Notifications />} />
             </Route>
-            
-            <Route 
-              path="/monitoring" 
-              element={
-                <ProtectedRoute>
-                  <MainLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<MonitoringPanel />} />
-            </Route>
-            
-            <Route 
-              path="/settings" 
-              element={
-                <ProtectedRoute>
-                  <MainLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Settings />} />
-            </Route>
-            
-            <Route 
-              path="/notifications" 
-              element={
-                <ProtectedRoute>
-                  <MainLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<Notifications />} />
-            </Route>
-            
+
+            {/* Catch-all Route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

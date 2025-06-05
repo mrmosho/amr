@@ -20,26 +20,20 @@ const Login: React.FC = () => {
     setIsLoading(true);
     
     try {
-      // Log the attempt
-      console.log('Attempting login with:', { email, hasPassword: !!password });
-
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
-        password: password
+        password,
       });
 
-      if (error) {
-        console.error('Auth error:', error);
-        throw error;
-      }
+      if (error) throw error;
 
       if (data.user) {
-        console.log('Login successful:', data.user.id);
         toast({
           title: "Welcome back!",
           description: "Successfully logged in",
         });
-        navigate("/dashboard");
+        // Immediate redirect to dashboard
+        navigate("/dashboard", { replace: true });
       }
     } catch (error: any) {
       console.error('Login error:', error);
