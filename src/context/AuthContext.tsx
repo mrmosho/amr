@@ -1,18 +1,17 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { authService } from "@/services/auth.service";
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
+import type { User, Session } from "@supabase/supabase-js";
 
-export const AuthContext = createContext<{
+interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
-  user: any | null;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
-}>({
+  user: User | null;
+}
+
+export const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   isLoading: true,
   user: null,
-  login: async () => {},
-  logout: () => {},
 });
 
 export const useAuth = () => {
@@ -24,51 +23,37 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
-    // Check token and validate session
-    const token = localStorage.getItem("token");
-    if (token) {
-      // Validate token with backend
-      validateToken();
-    } else {
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
       setIsLoading(false);
-    }
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log('Auth state changed:', { event: _event, userId: session?.user?.id });
+      setSession(session);
+      setUser(session?.user ?? null);
+      setIsLoading(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const validateToken = async () => {
-    try {
-      const response = await authService.validate();
-      setUser(response.data);
-    } catch (error) {
-      logout();
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const login = async (email: string, password: string) => {
-    const data = await authService.login(email, password);
-    setUser(data.user);
-  };
-
-  const logout = () => {
-    authService.logout();
-    setUser(null);
-  };
-
   return (
-    <AuthContext.Provider
-      value={{
-        isAuthenticated: !!user,
-        isLoading,
-        user,
-        login,
-        logout,
-      }}
-    >
+    <AuthContext.Provider value={{
+      isAuthenticated: !!user,
+      isLoading,
+      user,
+    }}>
       {children}
     </AuthContext.Provider>
   );

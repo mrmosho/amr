@@ -20,6 +20,7 @@ const Login: React.FC = () => {
     setIsLoading(true);
     
     try {
+      console.log('Login attempt:', { email });
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password,
@@ -32,7 +33,7 @@ const Login: React.FC = () => {
           title: "Welcome back!",
           description: "Successfully logged in",
         });
-        // Immediate redirect to dashboard
+        console.log('Login successful, redirecting...');
         navigate("/dashboard", { replace: true });
       }
     } catch (error: any) {
