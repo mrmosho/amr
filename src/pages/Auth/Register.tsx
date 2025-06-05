@@ -22,24 +22,53 @@ const Register: React.FC = () => {
     e.preventDefault();
     setIsLoading(true);
 
-    try {
-      console.log('Attempting registration:', { email, hasPassword: !!password });
+    // Validation
+    if (password !== confirmPassword) {
+      toast({
+        variant: "destructive",
+        title: "Passwords do not match",
+        description: "Please make sure your passwords match",
+      });
+      setIsLoading(false);
+      return;
+    }
 
-      const { data, error } = await supabase.auth.signUp({
+    if (password.length < 6) {
+      toast({
+        variant: "destructive", 
+        title: "Password too short",
+        description: "Password must be at least 6 characters long",
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      // First create the auth user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email: email.trim(),
-        password: password,
+        password,
         options: {
-          emailRedirectTo: `${window.location.origin}/auth/callback`
+          data: {
+            full_name: name.trim(),
+          },
         }
       });
 
-      if (error) {
-        console.error('Registration error:', error);
-        throw error;
-      }
+      if (authError) throw authError;
 
-      if (data.user) {
-        console.log('Registration successful:', data.user.id);
+      if (authData.user) {
+        // Then create the profile
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: authData.user.id,
+            email: email.trim(),
+            full_name: name.trim(),
+          });
+
+        if (profileError) throw profileError;
+
         toast({
           title: "Account created!",
           description: "Please check your email to confirm your account.",
