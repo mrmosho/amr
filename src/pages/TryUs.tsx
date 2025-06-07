@@ -1,11 +1,12 @@
+
 import React, { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/UI/card';
-import { Button } from '@/components/UI/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/UI/tabs';
-import { Textarea } from '@/components/UI/textarea';
-import { Input } from '@/components/UI/input';
-import { Label } from '@/components/UI/label';
-import { TestTube, Upload, Eye, FileText, LayoutDashboard } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { TestTube, Upload, Eye, FileText, ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Link } from 'react-router-dom';
 import DetectionItem, { Detection, DetectionType } from '@/components/Monitoring/DetectionItem';
@@ -204,125 +205,135 @@ const TryUs: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 space-y-6">
-      <div className="flex flex-col items-center justify-center">
-        <div className="flex items-center gap-2 mb-2">
-          <TestTube className="h-6 w-6 text-primary" />
-          <h1 className="text-3xl font-bold">Try Our Detection System</h1>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <div className="border-b bg-card/50">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Link to="/home">
+                <Button variant="ghost" size="sm" className="gap-2">
+                  <ArrowLeft className="h-4 w-4" />
+                  Back to Home
+                </Button>
+              </Link>
+              <div className="flex items-center gap-2">
+                <TestTube className="h-6 w-6 text-primary" />
+                <h1 className="text-3xl font-bold">Try Our Detection System</h1>
+              </div>
+            </div>
+          </div>
+          <p className="text-muted-foreground max-w-2xl mt-2">
+            Experience how our system identifies and protects sensitive data in real-time.
+            Upload a file or paste your content to see the detection in action.
+          </p>
         </div>
-        <p className="text-muted-foreground text-center max-w-2xl">
-          Experience how our system identifies and protects sensitive data in real-time.
-          Upload a file or paste your content to see the detection in action.
-        </p>
-        <Link to="/dashboard" className="mt-4">
-          <Button variant="outline" size="sm" className="gap-2">
-            <LayoutDashboard className="h-4 w-4" /> Back to Dashboard
-          </Button>
-        </Link>
       </div>
 
-      <Card className="shadow-md animate-in">
-        <CardHeader>
-          <CardTitle>Sensitive Data Scanner</CardTitle>
-          <CardDescription>
-            Test our detection algorithm with your own content. We'll identify potential sensitive information.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Tabs
-            defaultValue="text"
-            value={activeTab}
-            onValueChange={setActiveTab}
-            className="space-y-4"
-          >
-            <TabsList className="grid grid-cols-2 w-full max-w-md mx-auto">
-              <TabsTrigger value="text">Manual Input</TabsTrigger>
-              <TabsTrigger value="file">File Upload</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="text" className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="content">Enter text with sensitive data (e.g., credit cards, emails, passwords)</Label>
-                <Textarea
-                  id="content"
-                  placeholder="Example: My credit card is 4111-1111-1111-1111 and my email is example@email.com"
-                  className="min-h-[200px]"
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                />
-                <div className="text-xs text-muted-foreground">
-                  Try including credit card numbers, emails, phone numbers, or passwords.
-                </div>
-              </div>
-              <Button 
-                className="w-full" 
-                onClick={handleTextScan}
-                disabled={isScanning || !text.trim()}
-              >
-                {isScanning ? "Scanning..." : "Scan Text"}
-              </Button>
-            </TabsContent>
-            
-            <TabsContent value="file" className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="file">Upload a text file (.txt, .docx, .pdf)</Label>
-                <div className="border border-dashed border-input rounded-md p-6 flex flex-col items-center justify-center gap-2">
-                  <Upload className="h-10 w-10 text-muted-foreground" />
-                  <p className="text-sm text-muted-foreground">Drag and drop or click to upload</p>
-                  <Input
-                    id="file"
-                    type="file"
-                    accept=".txt,.docx,.pdf"
-                    className="max-w-sm"
-                    onChange={handleFileUpload}
+      <div className="container mx-auto px-4 py-6 space-y-6">
+        <Card className="shadow-md">
+          <CardHeader>
+            <CardTitle>Sensitive Data Scanner</CardTitle>
+            <CardDescription>
+              Test our detection algorithm with your own content. We'll identify potential sensitive information.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs
+              defaultValue="text"
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="space-y-4"
+            >
+              <TabsList className="grid grid-cols-2 w-full max-w-md mx-auto">
+                <TabsTrigger value="text">Manual Input</TabsTrigger>
+                <TabsTrigger value="file">File Upload</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="text" className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="content">Enter text with sensitive data (e.g., credit cards, emails, passwords)</Label>
+                  <Textarea
+                    id="content"
+                    placeholder="Example: My credit card is 4111-1111-1111-1111 and my email is example@email.com"
+                    className="min-h-[200px]"
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
                   />
-                </div>
-                {file && (
-                  <div className="flex items-center gap-2 text-sm">
-                    <FileText className="h-4 w-4" />
-                    <span>{file.name}</span>
+                  <div className="text-xs text-muted-foreground">
+                    Try including credit card numbers, emails, phone numbers, or passwords.
                   </div>
-                )}
-              </div>
-              <Button 
-                className="w-full" 
-                onClick={handleFileScan}
-                disabled={isScanning || !file}
-              >
-                {isScanning ? "Scanning File..." : "Scan File"}
-              </Button>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
-
-      {detections.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-xl font-bold">Detection Results</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {detections.map(detection => (
-              <DetectionItem 
-                key={detection.id}
-                detection={detection}
-                onEncrypt={handleEncrypt}
-                onView={() => handleView(detection)}
-                onIgnore={handleIgnore}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {detections.length === 0 && text && !isScanning && (
-        <Card className="bg-muted/50">
-          <CardContent className="flex flex-col items-center justify-center py-8">
-            <Eye className="h-10 w-10 text-muted-foreground mb-2" />
-            <p className="text-center text-muted-foreground">
-              No sensitive data detected in your input. Try adding example data like credit card numbers or emails.
-            </p>
+                </div>
+                <Button 
+                  className="w-full" 
+                  onClick={handleTextScan}
+                  disabled={isScanning || !text.trim()}
+                >
+                  {isScanning ? "Scanning..." : "Scan Text"}
+                </Button>
+              </TabsContent>
+              
+              <TabsContent value="file" className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="file">Upload a text file (.txt, .docx, .pdf)</Label>
+                  <div className="border border-dashed border-input rounded-md p-6 flex flex-col items-center justify-center gap-2">
+                    <Upload className="h-10 w-10 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">Drag and drop or click to upload</p>
+                    <Input
+                      id="file"
+                      type="file"
+                      accept=".txt,.docx,.pdf"
+                      className="max-w-sm"
+                      onChange={handleFileUpload}
+                    />
+                  </div>
+                  {file && (
+                    <div className="flex items-center gap-2 text-sm">
+                      <FileText className="h-4 w-4" />
+                      <span>{file.name}</span>
+                    </div>
+                  )}
+                </div>
+                <Button 
+                  className="w-full" 
+                  onClick={handleFileScan}
+                  disabled={isScanning || !file}
+                >
+                  {isScanning ? "Scanning File..." : "Scan File"}
+                </Button>
+              </TabsContent>
+            </Tabs>
           </CardContent>
         </Card>
-      )}
+
+        {detections.length > 0 && (
+          <div className="space-y-4">
+            <h2 className="text-xl font-bold">Detection Results</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {detections.map(detection => (
+                <DetectionItem 
+                  key={detection.id}
+                  detection={detection}
+                  onEncrypt={handleEncrypt}
+                  onView={() => handleView(detection)}
+                  onIgnore={handleIgnore}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {detections.length === 0 && text && !isScanning && (
+          <Card className="bg-muted/50">
+            <CardContent className="flex flex-col items-center justify-center py-8">
+              <Eye className="h-10 w-10 text-muted-foreground mb-2" />
+              <p className="text-center text-muted-foreground">
+                No sensitive data detected in your input. Try adding example data like credit card numbers or emails.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   );
 };

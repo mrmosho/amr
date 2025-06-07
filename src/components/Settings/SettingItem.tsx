@@ -1,8 +1,8 @@
 
 import React from "react";
-import { Label } from "@/components/UI/label";
-import { Switch } from "@/components/UI/switch";
-import { Slider } from "@/components/UI/slider";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 
 interface BaseSettingItemProps {

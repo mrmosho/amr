@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
-import { Button } from "@/components/UI/button";
-import { Card } from "@/components/UI/card";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +9,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger
-} from "@/components/UI/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 import { Bell, Settings, ShieldAlert, X } from "lucide-react";
 import { cn } from '@/lib/utils';
 

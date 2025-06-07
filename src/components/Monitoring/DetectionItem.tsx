@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Badge } from '@/components/UI/badge';
+import { Badge } from '@/components/ui/badge';
 import { Eye, FileText, Shield, ShieldAlert } from 'lucide-react';
 import ConfidenceBar from './ConfidenceBar';
 

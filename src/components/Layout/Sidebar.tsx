@@ -2,7 +2,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/UI/button";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { 
   ChevronLeft, 
@@ -11,9 +11,7 @@ import {
   Lock, 
   Bell, 
   BarChart, 
-  CreditCard, 
-  TestTube, 
-  Users 
+  CreditCard
 } from "lucide-react";
 
 interface SidebarProps {
@@ -35,16 +33,6 @@ const Sidebar: React.FC<SidebarProps> = ({ collapsed, setCollapsed }) => {
       name: "Monitoring",
       path: "/monitoring",
       icon: <Lock className="w-5 h-5" />,
-    },
-    {
-      name: "Try Us",
-      path: "/try-us",
-      icon: <TestTube className="w-5 h-5" />,
-    },
-    {
-      name: "About Us",
-      path: "/about",
-      icon: <Users className="w-5 h-5" />,
     },
     {
       name: "Notifications",

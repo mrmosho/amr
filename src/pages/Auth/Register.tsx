@@ -1,12 +1,13 @@
+
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Button } from "@/components/UI/button";
-import { Input } from "@/components/UI/input";
-import { Label } from "@/components/UI/label";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/UI/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/AuthContext";
 import { Lock } from "lucide-react";
-import { supabase } from "@/lib/supabase"; // Add this import
 
 const Register: React.FC = () => {
   const [name, setName] = useState("");
@@ -15,51 +16,31 @@ const Register: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { register } = useAuth();
   const navigate = useNavigate();
-
-  // Remove useAuth hook since we're using Supabase directly
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-        options: {
-          data: {
-            full_name: name.trim(),
-          },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
-        }
+    
+    if (password !== confirmPassword) {
+      toast({
+        variant: "destructive",
+        title: "Passwords don't match",
+        description: "Please ensure both passwords match",
       });
-
-      if (error) throw error;
-
-      if (data.user) {
-        if (data.session) {
-          // User is automatically signed in - redirect to dashboard
-          toast({
-            title: "Account created!",
-            description: "Welcome to your dashboard",
-          });
-          navigate("/dashboard", { replace: true });
-        } else {
-          // Email confirmation required
-          toast({
-            title: "Account created!",
-            description: "Please check your email to confirm your account",
-          });
-          navigate("/login", { replace: true });
-        }
-      }
-    } catch (error: any) {
-      console.error('Registration error:', error);
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      await register(name, email, password);
+      navigate("/dashboard");
+    } catch (error) {
       toast({
         variant: "destructive",
         title: "Registration failed",
-        description: error.message || "Could not create account",
+        description: "There was an error creating your account",
       });
     } finally {
       setIsLoading(false);
