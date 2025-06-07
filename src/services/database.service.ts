@@ -1,18 +1,29 @@
 import { supabase } from '@/lib/supabase';
 
-export type Detection = {
+export interface Scan {
+  id: string;
+  user_id: string;
+  status: 'pending' | 'in_progress' | 'completed' | 'failed';
+  scan_type: 'quick' | 'full' | 'custom';
+  total_files?: number;
+  created_at: string;
+  completed_at?: string;
+}
+
+export interface Detection {
   id: string;
   scan_id: string;
   user_id: string;
-  threat_type: 'malware' | 'ransomware' | 'spyware' | 'trojan' | 'other';
+  threat_type: 'malware' | 'ransomware' | 'keylogger' | 'suspicious_behavior';
   severity: 'low' | 'medium' | 'high' | 'critical';
   file_path: string;
+  detection_date: string;
   status: 'detected' | 'quarantined' | 'removed' | 'ignored';
-};
+}
 
 export const databaseService = {
   // Scans
-  async createScan(userId: string, scanType: 'quick' | 'full' | 'custom') {
+  async createScan(userId: string, scanType: Scan['scan_type']) {
     const { data, error } = await supabase
       .from('scans')
       .insert({
@@ -28,18 +39,18 @@ export const databaseService = {
   },
 
   // Detections
-  async getRecentDetections() {
+  async recordDetection(detection: Omit<Detection, 'id' | 'detection_date'>) {
     const { data, error } = await supabase
       .from('detections')
-      .select('*')
-      .order('detection_date', { ascending: false })
-      .limit(10);
+      .insert(detection)
+      .select()
+      .single();
 
     if (error) throw error;
-    return data as Detection[];
+    return data;
   },
 
-  // Stats for Dashboard
+  // Dashboard Stats
   async getDashboardStats(userId: string) {
     const { data: detections, error: detectionsError } = await supabase
       .from('detections')
@@ -56,12 +67,12 @@ export const databaseService = {
       .limit(1)
       .single();
 
-    if (scanError) throw scanError;
+    if (scanError && scanError.code !== 'PGRST116') throw scanError;
 
     return {
-      totalDetections: detections.length,
-      lastScanStatus: latestScan.status,
-      protectedFiles: latestScan.total_files
+      totalDetections: detections?.length || 0,
+      lastScanStatus: latestScan?.status || 'none',
+      protectedFiles: latestScan?.total_files || 0
     };
   }
 };
