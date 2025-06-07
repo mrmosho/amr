@@ -45,39 +45,46 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (error) throw error;
     },
     register: async (name: string, email: string, password: string) => {
-      const now = Date.now();
-      
-      // Check if we're still in cooldown
-      if (now - lastAttempt < COOLDOWN_DURATION) {
-        const remainingTime = Math.ceil((COOLDOWN_DURATION - (now - lastAttempt)) / 1000);
-        throw new Error(`Please wait ${remainingTime} seconds before trying again.`);
-      }
-
       try {
-        setLastAttempt(now);
+        console.log('Starting registration with:', { name, email });
         
+        // First, check if email exists
+        const { data: existingUser, error: checkError } = await supabase
+          .from('auth.users')
+          .select('email')
+          .eq('email', email)
+          .single();
+
+        if (checkError && !checkError.message.includes('No rows found')) {
+          console.error('Error checking email:', checkError);
+          throw new Error('Registration failed. Please try again.');
+        }
+
+        if (existingUser) {
+          throw new Error('Email already registered.');
+        }
+
+        // Proceed with registration
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             data: { full_name: name },
-            emailRedirectTo: `${window.location.origin}/auth/callback`
+            emailRedirectTo: window.location.origin + '/auth/callback'
           }
         });
 
         if (error) {
-          // Handle specific error types
+          console.error('Registration error:', error);
           if (error.message.includes('rate limit')) {
             throw new Error('Registration limit reached. Please try again in a few minutes.');
-          }
-          if (error.message.includes('email')) {
-            throw new Error('Invalid email or email already registered.');
           }
           throw error;
         }
 
+        console.log('Registration successful:', data);
         return data;
-      } catch (error) {
+      } catch (error: any) {
         console.error('Registration error in AuthContext:', error);
         throw error;
       }

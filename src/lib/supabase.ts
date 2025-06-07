@@ -6,15 +6,14 @@ const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 console.log('Supabase Configuration:', {
   hasUrl: !!supabaseUrl,
   hasKey: !!supabaseKey,
-  url: supabaseUrl
+  baseUrl: supabaseUrl
 });
 
-if (!supabaseUrl || !supabaseKey) {
-  console.error('Environment variables not loaded:', {
-    VITE_SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
-    hasKey: !!import.meta.env.VITE_SUPABASE_ANON_KEY
-  });
-  throw new Error('Missing Supabase credentials');
-}
-
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: true,
+    flowType: 'pkce'
+  }
+});

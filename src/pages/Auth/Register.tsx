@@ -26,19 +26,19 @@ const Register: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Validation checks
-      if (password !== confirmPassword) {
+      console.log('Starting registration with:', { email });
+      
+      if (!email.includes('@')) {
         toast({
           variant: "destructive",
-          title: "Passwords do not match",
-          description: "Please ensure both passwords are identical"
+          title: "Invalid email",
+          description: "Please enter a valid email address"
         });
-        setIsLoading(false);
         return;
       }
 
-      console.log('Starting registration process...');
       const result = await register(name, email, password);
+      console.log('Registration result:', result);
 
       if (result?.user) {
         toast({
@@ -49,17 +49,10 @@ const Register: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Registration error:', error);
-      
-      const errorMessage = error.message.includes('rate limit') 
-        ? 'Too many registration attempts. Please try again in 60 minutes.'
-        : error.message.includes('email')
-        ? 'Invalid email or already registered.'
-        : 'Registration failed. Please try again.';
-      
       toast({
         variant: "destructive",
         title: "Registration failed",
-        description: errorMessage
+        description: error.message || "An error occurred during registration"
       });
     } finally {
       setIsLoading(false);
