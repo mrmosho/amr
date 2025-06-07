@@ -1,21 +1,17 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Add debug logging
-console.log('Environment Loading:', {
-  mode: import.meta.env.MODE,
-  supabaseUrl: import.meta.env.VITE_SUPABASE_URL,
-  hasKey: !!import.meta.env.VITE_SUPABASE_ANON_KEY,
-  isDev: import.meta.env.DEV
-});
-
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
+// Add debug logging
+console.log('Supabase Configuration:', {
+  hasUrl: !!supabaseUrl,
+  hasKey: !!supabaseKey,
+  url: supabaseUrl
+});
+
 if (!supabaseUrl || !supabaseKey) {
-  throw new Error(`Supabase credentials missing! 
-    URL exists: ${!!supabaseUrl}
-    Key exists: ${!!supabaseKey}
-    Please check your environment variables.`);
+  throw new Error('Missing Supabase credentials');
 }
 
 export const supabase = createClient(supabaseUrl, supabaseKey, {

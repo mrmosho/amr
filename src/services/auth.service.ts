@@ -17,6 +17,8 @@ export const authService = {
     password: string;
     name: string;
   }) {
+    console.log('Starting registration process...', { email: userData.email });
+
     const { data, error } = await supabase.auth.signUp({
       email: userData.email,
       password: userData.password,
@@ -24,14 +26,20 @@ export const authService = {
         data: {
           full_name: userData.name
         },
-        emailRedirectTo: `${window.location.origin}/auth/callback`
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
       }
     });
 
-    if (error) throw error;
+    if (error) {
+      console.error('Registration error:', error);
+      throw error;
+    }
 
-    // Create profile after successful registration
+    console.log('Auth signup response:', data);
+
+    // Only create profile if we have a user
     if (data.user) {
+      console.log('Creating user profile...');
       const { error: profileError } = await supabase
         .from('profiles')
         .insert({
@@ -40,7 +48,10 @@ export const authService = {
           full_name: userData.name,
         });
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Profile creation error:', profileError);
+        throw profileError;
+      }
     }
 
     return data;

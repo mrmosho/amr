@@ -23,7 +23,11 @@ const Register: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await register(name, email, password);
+      console.log('Submitting registration...', { email, name });
+      
+      const result = await register(name, email, password);
+
+      console.log('Registration result:', result);
 
       toast({
         title: "Registration successful!",
@@ -32,6 +36,7 @@ const Register: React.FC = () => {
 
       navigate('/login');
     } catch (error: any) {
+      console.error('Registration error in component:', error);
       toast({
         variant: "destructive",
         title: "Registration failed",
