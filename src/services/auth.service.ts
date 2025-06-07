@@ -1,85 +1,43 @@
 import { supabase } from '@/lib/supabase';
-import { User } from '@supabase/supabase-js';
 
 export const authService = {
-  async login(email: string, password: string) {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
-
-    if (error) throw error;
-    return data;
-  },
-
-  async register(userData: {
-    email: string;
-    password: string;
-    name: string;
-  }) {
-    console.log('Starting registration process...', { email: userData.email });
-
+  async register(name: string, email: string, password: string) {
+    console.log('Auth Service: Starting registration...', { email, name });
+    
     const { data, error } = await supabase.auth.signUp({
-      email: userData.email,
-      password: userData.password,
+      email,
+      password,
       options: {
-        data: {
-          full_name: userData.name
-        },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        data: { full_name: name },
+        emailRedirectTo: `${window.location.origin}/auth/callback`
       }
     });
 
     if (error) {
-      console.error('Registration error:', error);
+      console.error('Auth Service: Registration error', error);
       throw error;
     }
 
-    console.log('Auth signup response:', data);
+    console.log('Auth Service: Registration successful', data);
 
-    // Only create profile if we have a user
     if (data.user) {
-      console.log('Creating user profile...');
+      // Create user profile
       const { error: profileError } = await supabase
         .from('profiles')
-        .insert({
-          id: data.user.id,
-          email: userData.email,
-          full_name: userData.name,
-        });
+        .insert([
+          {
+            id: data.user.id,
+            full_name: name,
+            email: email
+          }
+        ]);
 
       if (profileError) {
-        console.error('Profile creation error:', profileError);
+        console.error('Auth Service: Profile creation error', profileError);
         throw profileError;
       }
     }
 
     return data;
-  },
-
-  async resetPassword(email: string) {
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/reset-password`,
-    });
-
-    if (error) throw error;
-  },
-
-  async updatePassword(newPassword: string) {
-    const { error } = await supabase.auth.updateUser({
-      password: newPassword
-    });
-
-    if (error) throw error;
-  },
-
-  async getCurrentUser(): Promise<User | null> {
-    const { data: { user } } = await supabase.auth.getUser();
-    return user;
-  },
-
-  async logout() {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
   }
 };
