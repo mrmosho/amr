@@ -26,7 +26,7 @@ const AboutUs: React.FC = () => {
       id: 1,
       name: 'Prof. Hany Ammar',
       role: 'Project Supervisor',
-      image: '/images/dr-hany.jpeg',
+      image: '/images/dr hany.jpeg',
       bio: 'Leading the team with expertise in security and software engineering. Prof. Ammar brings years of academic and industry experience to guide the project vision.',
       isSupervisor: true,
       links: {
