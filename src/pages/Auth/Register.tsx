@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import { Lock } from "lucide-react";
+import { RateLimiter } from '@/lib/utils/rateLimit';
 
 const Register: React.FC = () => {
   const [name, setName] = useState("");
@@ -17,17 +18,43 @@ const Register: React.FC = () => {
   const { toast } = useToast();
   const { register } = useAuth();
   const navigate = useNavigate();
+  const rateLimiter = React.useMemo(() => new RateLimiter(3, 60000), []); // 3 attempts per minute
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
+      // Check password match
+      if (password !== confirmPassword) {
+        toast({
+          variant: "destructive",
+          title: "Passwords do not match",
+          description: "Please ensure both passwords are identical"
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // Check rate limit
+      try {
+        rateLimiter.canAttempt(email);
+      } catch (error: any) {
+        toast({
+          variant: "destructive",
+          title: "Too many attempts",
+          description: error.message
+        });
+        setIsLoading(false);
+        return;
+      }
+
       console.log('Starting registration process...');
       const result = await register(name, email, password);
       console.log('Registration result:', result);
 
       if (result?.user) {
+        rateLimiter.reset(email); // Reset on success
         toast({
           title: "Registration successful!",
           description: "Please check your email to confirm your account.",
@@ -36,10 +63,15 @@ const Register: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Registration error:', error);
+      
+      const errorMessage = error.message.includes('rate limit') 
+        ? "Too many registration attempts. Please try again in a minute."
+        : error.message;
+      
       toast({
         variant: "destructive",
         title: "Registration failed",
-        description: error.message
+        description: errorMessage
       });
     } finally {
       setIsLoading(false);

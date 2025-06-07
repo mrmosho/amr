@@ -43,27 +43,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     },
     register: async (name: string, email: string, password: string) => {
       try {
-        console.log('Starting registration in AuthContext...', { email });
-        
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             data: { full_name: name },
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
-            // Add these options for Supabase email provider
-            emailOptions: {
-              emailRedirectTo: `${window.location.origin}/auth/callback`
-            }
+            emailRedirectTo: `${window.location.origin}/auth/callback`
           }
         });
 
         if (error) {
-          console.error('Supabase auth error:', error);
+          if (error.message.includes('rate limit')) {
+            throw new Error('Too many registration attempts. Please try again later.');
+          }
           throw error;
         }
 
-        console.log('Registration response:', data);
         return data;
       } catch (error) {
         console.error('Registration error in AuthContext:', error);
