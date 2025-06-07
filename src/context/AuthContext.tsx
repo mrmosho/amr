@@ -48,13 +48,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         console.log('Starting registration with:', { name, email });
         
-        // Add specific error handling for email service
+        // Validate input before sending
+        if (!email || !password || !name) {
+          throw new Error('All fields are required');
+        }
+
+        if (password.length < 6) {
+          throw new Error('Password must be at least 6 characters');
+        }
+
+        // Remove any existing session
+        await supabase.auth.signOut();
+
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
-            data: { full_name: name },
-            emailRedirectTo: `${window.location.origin}/auth/callback`
+            data: { 
+              full_name: name 
+            }
           }
         });
 
@@ -62,31 +74,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           console.error('Registration error:', error);
           
           // Handle specific error cases
-          if (error.message.includes('confirmation email')) {
-            throw new Error('Unable to send confirmation email. Please try again later or contact support.');
+          switch(true) {
+            case error.message.includes('rate limit'):
+              throw new Error('Too many attempts. Please try again later.');
+            case error.message.includes('already registered'):
+              throw new Error('This email is already registered.');
+            case error.message.includes('email'):
+              throw new Error('Invalid email address.');
+            default:
+              throw new Error('Registration failed. Please try again.');
           }
-          if (error.message.includes('rate limit')) {
-            throw new Error('Registration limit reached. Please try again in a few minutes.');
-          }
-          if (error.message.includes('already registered')) {
-            throw new Error('This email is already registered.');
-          }
-          
-          // Log additional error details for debugging
-          console.error('Detailed error:', {
-            message: error.message,
-            status: error.status,
-            name: error.name
-          });
-          
-          throw new Error('Registration failed. Please try again.');
         }
 
         if (!data.user) {
           throw new Error('Registration failed - no user data received');
         }
 
-        // Create profile only if we have user data
+        // Create profile after successful registration
         const { error: profileError } = await supabase
           .from('profiles')
           .insert({
@@ -98,10 +102,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         if (profileError) {
           console.error('Profile creation error:', profileError);
-          // Don't throw here - user is still created
         }
 
-        console.log('Registration successful:', data);
         return data;
       } catch (error: any) {
         console.error('Registration error in AuthContext:', error);
