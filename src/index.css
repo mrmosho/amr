@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -93,6 +92,12 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Add mobile touch handling for cards */
+  .card {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: pan-y;
   }
 }
 
