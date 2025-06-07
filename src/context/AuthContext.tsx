@@ -13,9 +13,12 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const COOLDOWN_DURATION = 60 * 1000; // 1 minute in milliseconds
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [lastAttempt, setLastAttempt] = useState<number>(0);
 
   useEffect(() => {
     // Check active sessions and sets the user
@@ -42,7 +45,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (error) throw error;
     },
     register: async (name: string, email: string, password: string) => {
+      const now = Date.now();
+      
+      // Check if we're still in cooldown
+      if (now - lastAttempt < COOLDOWN_DURATION) {
+        const remainingTime = Math.ceil((COOLDOWN_DURATION - (now - lastAttempt)) / 1000);
+        throw new Error(`Please wait ${remainingTime} seconds before trying again.`);
+      }
+
       try {
+        setLastAttempt(now);
+        
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -53,8 +66,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         });
 
         if (error) {
+          // Handle specific error types
           if (error.message.includes('rate limit')) {
-            throw new Error('Too many registration attempts. Please try again later.');
+            throw new Error('Registration limit reached. Please try again in a few minutes.');
+          }
+          if (error.message.includes('email')) {
+            throw new Error('Invalid email or email already registered.');
           }
           throw error;
         }

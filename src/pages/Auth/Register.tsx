@@ -25,7 +25,7 @@ const Register: React.FC = () => {
     setIsLoading(true);
 
     try {
-      // Check password match
+      // Validation checks
       if (password !== confirmPassword) {
         toast({
           variant: "destructive",
@@ -37,24 +37,22 @@ const Register: React.FC = () => {
       }
 
       // Check rate limit
-      try {
-        rateLimiter.canAttempt(email);
-      } catch (error: any) {
-        toast({
-          variant: "destructive",
-          title: "Too many attempts",
-          description: error.message
+      const { data: rateLimit, error: rateLimitError } = await supabase
+        .rpc('check_rate_limit', {
+          p_ip_address: 'client', // We'll use a placeholder since we can't get client IP
+          p_email: email,
+          p_max_attempts: 3,
+          p_window_minutes: 60
         });
-        setIsLoading(false);
-        return;
+
+      if (rateLimitError || !rateLimit) {
+        throw new Error('Too many registration attempts. Please try again later.');
       }
 
       console.log('Starting registration process...');
       const result = await register(name, email, password);
-      console.log('Registration result:', result);
 
       if (result?.user) {
-        rateLimiter.reset(email); // Reset on success
         toast({
           title: "Registration successful!",
           description: "Please check your email to confirm your account.",
@@ -65,8 +63,10 @@ const Register: React.FC = () => {
       console.error('Registration error:', error);
       
       const errorMessage = error.message.includes('rate limit') 
-        ? "Too many registration attempts. Please try again in a minute."
-        : error.message;
+        ? 'Too many registration attempts. Please try again in 60 minutes.'
+        : error.message.includes('email')
+        ? 'Invalid email or already registered.'
+        : 'Registration failed. Please try again.';
       
       toast({
         variant: "destructive",
