@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { Github, Linkedin, Mail, Users, LayoutDashboard, ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -119,40 +119,48 @@ const AboutUs: React.FC = () => {
             {teamMembers
               .filter(member => member.isSupervisor)
               .map(member => (
-                <Card 
-                  key={member.id} 
-                  className="max-w-md group hover:shadow-lg transition-all duration-300 border-primary/20"
-                >
-                  <CardHeader className="text-center">
-                    <div className="w-32 h-32 mx-auto rounded-full overflow-hidden mb-4 border-4 border-primary/20 grayscale group-hover:grayscale-0 transition-all duration-500">
-                      <img 
-                        src={member.image} 
-                        alt={member.name}
-                        className="w-full h-full object-cover"
-                      />
+                <HoverCard key={member.id}>
+                  <HoverCardTrigger asChild>
+                    <Card className="max-w-md group hover:shadow-lg transition-all duration-300 border-primary/20 cursor-pointer">
+                      <CardHeader className="text-center">
+                        <div className="w-32 h-32 mx-auto rounded-full overflow-hidden mb-4 border-4 border-primary/20 grayscale group-hover:grayscale-0 transition-all duration-500">
+                          <img 
+                            src={member.image} 
+                            alt={member.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <Badge variant="outline" className="bg-primary/10 mb-2 mx-auto w-fit">
+                          Supervisor
+                        </Badge>
+                        <CardTitle className="text-xl">{member.name}</CardTitle>
+                        <CardDescription>{member.role}</CardDescription>
+                      </CardHeader>
+                      <CardContent className="text-center">
+                        <p className="text-sm text-muted-foreground line-clamp-3">{member.bio}</p>
+                      </CardContent>
+                      <CardFooter className="flex justify-center space-x-4">
+                        {member.links?.email && (
+                          <a href={`mailto:${member.links.email}`} className="text-muted-foreground hover:text-primary" aria-label="Email">
+                            <Mail className="h-5 w-5" />
+                          </a>
+                        )}
+                        {member.links?.linkedin && (
+                          <a href={member.links.linkedin} className="text-muted-foreground hover:text-primary" aria-label="LinkedIn">
+                            <Linkedin className="h-5 w-5" />
+                          </a>
+                        )}
+                      </CardFooter>
+                    </Card>
+                  </HoverCardTrigger>
+                  <HoverCardContent className="w-80">
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-semibold">{member.name}</h4>
+                      <p className="text-sm text-muted-foreground">{member.role}</p>
+                      <p className="text-sm">{member.bio}</p>
                     </div>
-                    <Badge variant="outline" className="bg-primary/10 mb-2 mx-auto w-fit">
-                      Supervisor
-                    </Badge>
-                    <CardTitle className="text-xl">{member.name}</CardTitle>
-                    <CardDescription>{member.role}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="text-center">
-                    <p className="text-sm text-muted-foreground">{member.bio}</p>
-                  </CardContent>
-                  <CardFooter className="flex justify-center space-x-4">
-                    {member.links?.email && (
-                      <a href={`mailto:${member.links.email}`} className="text-muted-foreground hover:text-primary" aria-label="Email">
-                        <Mail className="h-5 w-5" />
-                      </a>
-                    )}
-                    {member.links?.linkedin && (
-                      <a href={member.links.linkedin} className="text-muted-foreground hover:text-primary" aria-label="LinkedIn">
-                        <Linkedin className="h-5 w-5" />
-                      </a>
-                    )}
-                  </CardFooter>
-                </Card>
+                  </HoverCardContent>
+                </HoverCard>
               ))}
           </div>
         </div>
@@ -164,41 +172,52 @@ const AboutUs: React.FC = () => {
             {teamMembers
               .filter(member => !member.isSupervisor)
               .map(member => (
-                <Card key={member.id} className="group hover:scale-105 hover:shadow-lg transition-all duration-300">
-                  <CardHeader className="text-center">
-                    <div className="w-24 h-24 mx-auto rounded-full overflow-hidden mb-4 border-2 border-muted grayscale group-hover:grayscale-0 transition-all duration-500">
-                      <img 
-                        src={member.image} 
-                        alt={member.name}
-                        className="w-full h-full object-cover"
-                      />
+                <HoverCard key={member.id}>
+                  <HoverCardTrigger asChild>
+                    <Card className="group hover:scale-105 hover:shadow-lg transition-all duration-300 cursor-pointer">
+                      <CardHeader className="text-center">
+                        <div className="w-24 h-24 mx-auto rounded-full overflow-hidden mb-4 border-2 border-muted grayscale group-hover:grayscale-0 transition-all duration-500">
+                          <img 
+                            src={member.image} 
+                            alt={member.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <CardTitle className="text-lg">{member.name}</CardTitle>
+                        <CardDescription className="text-sm">{member.role}</CardDescription>
+                      </CardHeader>
+                      <CardContent className="text-center h-20 overflow-hidden">
+                        <p className="text-xs text-muted-foreground">
+                          {member.bio.substring(0, 60)}...
+                        </p>
+                      </CardContent>
+                      <CardFooter className="flex justify-center space-x-4">
+                        {member.links?.github && (
+                          <a href={member.links.github} className="text-muted-foreground hover:text-primary" aria-label="GitHub">
+                            <Github className="h-4 w-4" />
+                          </a>
+                        )}
+                        {member.links?.linkedin && (
+                          <a href={member.links.linkedin} className="text-muted-foreground hover:text-primary" aria-label="LinkedIn">
+                            <Linkedin className="h-4 w-4" />
+                          </a>
+                        )}
+                        {member.links?.email && (
+                          <a href={`mailto:${member.links.email}`} className="text-muted-foreground hover:text-primary" aria-label="Email">
+                            <Mail className="h-4 w-4" />
+                          </a>
+                        )}
+                      </CardFooter>
+                    </Card>
+                  </HoverCardTrigger>
+                  <HoverCardContent className="w-80">
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-semibold">{member.name}</h4>
+                      <p className="text-sm text-muted-foreground">{member.role}</p>
+                      <p className="text-sm">{member.bio}</p>
                     </div>
-                    <CardTitle className="text-lg">{member.name}</CardTitle>
-                    <CardDescription className="text-sm">{member.role}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="text-center h-20 overflow-hidden">
-                    <p className="text-xs text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      {member.bio.substring(0, 80)}...
-                    </p>
-                  </CardContent>
-                  <CardFooter className="flex justify-center space-x-4">
-                    {member.links?.github && (
-                      <a href={member.links.github} className="text-muted-foreground hover:text-primary" aria-label="GitHub">
-                        <Github className="h-4 w-4" />
-                      </a>
-                    )}
-                    {member.links?.linkedin && (
-                      <a href={member.links.linkedin} className="text-muted-foreground hover:text-primary" aria-label="LinkedIn">
-                        <Linkedin className="h-4 w-4" />
-                      </a>
-                    )}
-                    {member.links?.email && (
-                      <a href={`mailto:${member.links.email}`} className="text-muted-foreground hover:text-primary" aria-label="Email">
-                        <Mail className="h-4 w-4" />
-                      </a>
-                    )}
-                  </CardFooter>
-                </Card>
+                  </HoverCardContent>
+                </HoverCard>
               ))}
           </div>
         </div>
