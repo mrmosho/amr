@@ -48,29 +48,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         console.log('Starting registration with:', { name, email });
         
-        // First, check if email exists
-        const { data: existingUser, error: checkError } = await supabase
-          .from('auth.users')
-          .select('email')
-          .eq('email', email)
-          .single();
-
-        if (checkError && !checkError.message.includes('No rows found')) {
-          console.error('Error checking email:', checkError);
-          throw new Error('Registration failed. Please try again.');
-        }
-
-        if (existingUser) {
-          throw new Error('Email already registered.');
-        }
-
-        // Proceed with registration
+        // Remove the email check since Supabase handles this automatically
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             data: { full_name: name },
-            emailRedirectTo: window.location.origin + '/auth/callback'
+            emailRedirectTo: `${window.location.origin}/auth/callback`
           }
         });
 
@@ -79,7 +63,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           if (error.message.includes('rate limit')) {
             throw new Error('Registration limit reached. Please try again in a few minutes.');
           }
-          throw error;
+          if (error.message.includes('already registered')) {
+            throw new Error('This email is already registered.');
+          }
+          throw new Error('Registration failed. Please try again.');
+        }
+
+        // If registration is successful, create the profile
+        if (data.user) {
+          const { error: profileError } = await supabase
+            .from('profiles')
+            .insert({
+              id: data.user.id,
+              email: email,
+              full_name: name,
+              updated_at: new Date().toISOString()
+            });
+
+          if (profileError) {
+            console.error('Profile creation error:', profileError);
+          }
         }
 
         console.log('Registration successful:', data);
