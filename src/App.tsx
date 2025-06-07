@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -19,6 +18,7 @@ import Pricing from "./pages/Pricing";
 import TryUs from "./pages/TryUs";
 import AboutUs from "./pages/AboutUs";
 import NotFound from "./pages/NotFound";
+import AuthCallback from './pages/Auth/AuthCallback';
 
 // Protected route component that redirects to login if not authenticated
 import { useAuth } from "./context/AuthContext";
@@ -105,6 +105,9 @@ const App = () => (
             >
               <Route index element={<Notifications />} />
             </Route>
+            
+            {/* Add this route */}
+            <Route path="/auth/callback" element={<AuthCallback />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>

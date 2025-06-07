@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -21,26 +20,22 @@ const Register: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (password !== confirmPassword) {
-      toast({
-        variant: "destructive",
-        title: "Passwords don't match",
-        description: "Please ensure both passwords match",
-      });
-      return;
-    }
-    
     setIsLoading(true);
-    
+
     try {
       await register(name, email, password);
-      navigate("/dashboard");
-    } catch (error) {
+
+      toast({
+        title: "Registration successful!",
+        description: "Please check your email to confirm your account.",
+      });
+
+      navigate('/login');
+    } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Registration failed",
-        description: "There was an error creating your account",
+        description: error.message
       });
     } finally {
       setIsLoading(false);
