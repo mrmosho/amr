@@ -26,7 +26,7 @@ const AboutUs: React.FC = () => {
       id: 1,
       name: 'Prof. Hany Ammar',
       role: 'Project Supervisor',
-      image: '/images/dr-hany.jpg',
+      image: '/images/dr-hany.jpeg',
       bio: 'Leading the team with expertise in security and software engineering. Prof. Ammar brings years of academic and industry experience to guide the project vision.',
       isSupervisor: true,
       links: {
@@ -62,7 +62,7 @@ const AboutUs: React.FC = () => {
       id: 4,
       name: 'Marwan Mohamed',
       role: 'Security Specialist',
-      image: '/images/marwan.jpg',
+      image: '/images/marwan.png',
       bio: 'Focused on encryption algorithms and detection patterns. Marwan ensures that the system provides reliable protection against evolving security threats.',
       links: {
         github: '#',
