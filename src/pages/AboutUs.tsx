@@ -43,7 +43,7 @@ const AboutUs: React.FC = () => {
       links: {
         github: '#',
         linkedin: '#',
-        email: 'omar@example.com'
+        email: 'omarhusam1711@gmail.com'
       }
     },
     {

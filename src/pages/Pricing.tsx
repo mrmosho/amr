@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -66,10 +65,10 @@ const Pricing: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="flex items-center justify-between mb-8">
-        <Link to="/dashboard">
-          <Button variant="ghost" className="flex items-center gap-2">
-            <ArrowLeft size={16} />
-            Back to Dashboard
+        <Link to="/home">
+          <Button variant="ghost" size="sm" className="gap-2">
+            <ArrowLeft className="h-4 w-4" />
+            Back to Home
           </Button>
         </Link>
       </div>
