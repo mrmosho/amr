@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/AuthContext";
 import { Lock } from "lucide-react";
 import { RateLimiter } from '@/lib/utils/rateLimit';
+import { supabase } from '@/lib/supabase';
 
 const Register: React.FC = () => {
   const [name, setName] = useState("");
@@ -34,19 +35,6 @@ const Register: React.FC = () => {
         });
         setIsLoading(false);
         return;
-      }
-
-      // Check rate limit
-      const { data: rateLimit, error: rateLimitError } = await supabase
-        .rpc('check_rate_limit', {
-          p_ip_address: 'client', // We'll use a placeholder since we can't get client IP
-          p_email: email,
-          p_max_attempts: 3,
-          p_window_minutes: 60
-        });
-
-      if (rateLimitError || !rateLimit) {
-        throw new Error('Too many registration attempts. Please try again later.');
       }
 
       console.log('Starting registration process...');
